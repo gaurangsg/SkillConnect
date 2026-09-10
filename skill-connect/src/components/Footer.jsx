@@ -1,7 +1,23 @@
 // eslint-disable-next-line no-unused-vars
 import { motion } from 'framer-motion';
+import { useState } from 'react';
+import { subscribeToNewsletter } from '../api/client';
 
 const Footer = () => {
+  const [email, setEmail] = useState('');
+  const [message, setMessage] = useState('');
+
+  const subscribe = async (event) => {
+    event.preventDefault();
+    try {
+      await subscribeToNewsletter(email);
+      setEmail('');
+      setMessage('Subscribed successfully.');
+    } catch (error) {
+      setMessage(error.message);
+    }
+  };
+
   return (
     <motion.footer
 
@@ -40,14 +56,20 @@ const Footer = () => {
 
         <div>
           <h4 className="text-lg font-semibold mb-3 border-b border-yellow-500 pb-1">Newsletter</h4>
-          <input
+          <form onSubmit={subscribe}>
+            <input
             type="email"
             placeholder="Enter your email"
+            required
+            value={email}
+            onChange={(event) => setEmail(event.target.value)}
             className="w-full p-3 rounded-md bg-white text-black mb-2 focus:outline-none focus:ring-2 focus:ring-yellow-400"
-          />
-          <button className="w-full py-2 bg-yellow-400 text-black font-semibold rounded hover:bg-yellow-300 transition-all duration-300">
-            Subscribe
-          </button>
+            />
+            <button type="submit" className="w-full py-2 bg-yellow-400 text-black font-semibold rounded hover:bg-yellow-300 transition-all duration-300">
+              Subscribe
+            </button>
+          </form>
+          {message && <p className="text-sm text-gray-300 mt-2">{message}</p>}
         </div>
       </div>
 

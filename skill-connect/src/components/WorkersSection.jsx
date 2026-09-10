@@ -1,98 +1,95 @@
+import { useEffect, useState } from 'react';
 // eslint-disable-next-line no-unused-vars
 import { motion } from 'framer-motion';
+import { createBooking, getWorkers } from '../api/client';
 
-const workers = [
-  {
-    name: "Christine williams",
-    skill: "Plumber",
-    image: "https://randomuser.me/api/portraits/women/68.jpg"
-    
-  },
-  {
+const serviceIds = { plumber: 'plumbing', electrician: 'electrician', painter: 'painting', mason: 'masonry', carpenter: 'carpentry', gardener: 'gardening' };
 
-    name: "Sofia york",
-    skill: "Site Observer",
-    image: "https://media.istockphoto.com/id/1346124943/photo/architect-working-on-digital-tablet-at-construction-site.jpg?s=612x612&w=0&k=20&c=5QcuHtYjE7A8ldDe-JJ7uyElhHCzhtZD-2P850mHhok="
+const WorkersSection = ({ token }) => {
+  const [workers, setWorkers] = useState([]);
+  const [search, setSearch] = useState('');
+  const [bookingWorker, setBookingWorker] = useState(null);
+  const [booking, setBooking] = useState({ scheduledFor: '', address: '', description: '' });
+  const [message, setMessage] = useState('');
 
-  },
-  {
-    name: "John Doe",
-    skill: "Electrician",
-    image: "https://randomuser.me/api/portraits/men/32.jpg",
-  },
-  {
-    name: "Priya Sharma",
-    skill: "Painter",
-    image:"https://st2.depositphotos.com/5653638/11527/i/950/depositphotos_115271504-stock-photo-indian-young-girl-with-paint.jpg",
-  },
-  {
-    name: "David Brown",
-    skill: "Mason",
-    image: "https://www.shutterstock.com/shutterstock/photos/2060102003/display_1500/stock-photo-indian-construction-site-manager-standing-with-folded-arms-wearing-safety-vest-and-helmet-thinking-2060102003.jpg"
-  },
-  {
-    name: "Emily Davis",
-    skill: "Welder",
-    image: "https://www.cwbweldingfoundation.org/wp-content/uploads/2022/08/wiw.png"
-  },
-  {
-    name: "Mike Smith",
-    skill: "Carpenter",
-    image: "https://media.istockphoto.com/id/163204230/photo/young-construction-worker-carrying-wood-boards.jpg?s=612x612&w=0&k=20&c=fImTSVkOFQqwiyc2keRYbQQCOFfwSMMkrCCKN7d6ujY=",
-  },
-  {
-    name: "Aisha Ali",
-    skill: "Gardener",
-    image: "https://c8.alamy.com/comp/MTY3N5/young-female-gardener-holding-pot-with-flowers-in-glasshouse-MTY3N5.jpg"
-  },
-  {
-    name: "Liam Wilson",
-    skill: "Chef",
-    image: "https://www.shutterstock.com/image-photo/young-male-chef-isolated-on-600nw-710598367.jpg"
-  },
-  {
-    name: "Olivia Johnson",
-    skill: "Housekeeper",
-    image: "https://media.istockphoto.com/id/530815822/photo/hispanic-woman-housekeeping.jpg?s=612x612&w=0&k=20&c=QDbfmECjDjtZvPIJ7n37oEq6MrRzgMbJ1tBBf6Q7u0c="
+  useEffect(() => {
+    getWorkers(search).then(setWorkers);
+  }, [search]);
 
-  },
-  {
-    name: "Ethan Martinez",
-    skill: "Mechanic",
-    image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRlEFS4iCGvUFmcvmKKwsm277_cirTM2lWdfQ&s"
-  },
-  {
-    name: "Ava Garcia",
-    skill: "Electrician",
-    image: "https://www.shutterstock.com/image-photo/beautiful-female-construction-worker-on-260nw-268825181.jpg"
-  },
-];
+  const submitBooking = async (event) => {
+    event.preventDefault();
+    setMessage('');
+    try {
+      const workerId = bookingWorker.id || bookingWorker._id;
+      await createBooking(token, {
+        workerId: String(workerId),
+        serviceId: serviceIds[bookingWorker.skill.toLowerCase()] || 'electrician',
+        scheduledFor: booking.scheduledFor,
+        address: booking.address.trim(),
+        description: booking.description.trim(),
+      });
+      setMessage('Booking request sent.');
+      setBooking({ scheduledFor: '', address: '', description: '' });
+    } catch (error) {
+      setMessage(error.message);
+    }
+  };
 
-const WorkersSection = () => {
   return (
     <section id="hire" className="min-h-screen bg-gray-100 py-20 px-6">
       <div className="max-w-6xl mx-auto text-center">
-        <h2 className="text-4xl font-bold mb-12">Our Top Skilled Workers</h2>
+        <h2 className="text-4xl font-bold mb-6">Our Top Skilled Workers</h2>
+        <input
+          value={search}
+          onChange={(event) => setSearch(event.target.value)}
+          placeholder="Filter by name or skill"
+          className="mb-12 px-5 py-3 rounded-full border border-gray-300 w-full max-w-md"
+          aria-label="Filter workers"
+        />
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-10">
           {workers.map((worker, index) => (
             <motion.div
-              key={index}
+              key={worker.id}
               className="bg-white rounded-lg shadow-md p-6"
               initial={{ scale: 0 }}
               whileInView={{ scale: 1 }}
-              transition={{ duration: 0.5, delay: index * 0.2 }}
+              transition={{ duration: 0.5, delay: index * 0.08 }}
               whileHover={{ scale: 1.05 }}
             >
-              <img
-                src={worker.image}
-                alt={worker.name}
-                className="w-32 h-32 object-cover rounded-full mx-auto mb-4"
-              />
+              <img src={worker.imageUrl} alt={worker.name} className="w-32 h-32 object-cover rounded-full mx-auto mb-4" />
               <h3 className="text-xl font-semibold mb-2">{worker.name}</h3>
               <p className="text-gray-600">{worker.skill}</p>
+              <button
+                type="button"
+                onClick={() => {
+                  if (!token) {
+                    setMessage('Sign in above to book a worker.');
+                    return;
+                  }
+                  setMessage('');
+                  setBookingWorker(worker);
+                }}
+                className="mt-4 bg-yellow-400 px-4 py-2 rounded font-semibold hover:bg-yellow-300"
+              >
+                Book worker
+              </button>
             </motion.div>
           ))}
         </div>
+        {!workers.length && <p className="mt-8 text-gray-600">No workers found.</p>}
+        {message && <p className="mt-6 text-green-700">{message}</p>}
+        {bookingWorker && (
+          <form onSubmit={submitBooking} className="mt-10 max-w-xl mx-auto bg-white p-6 rounded-lg shadow text-left">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-xl font-semibold">Book {bookingWorker.name}</h3>
+              <button type="button" onClick={() => setBookingWorker(null)} aria-label="Close booking form" className="text-xl">&times;</button>
+            </div>
+            <input required type="datetime-local" value={booking.scheduledFor} onChange={(event) => setBooking({ ...booking, scheduledFor: event.target.value })} className="w-full border p-3 rounded mb-3" />
+            <input required placeholder="Service address" value={booking.address} onChange={(event) => setBooking({ ...booking, address: event.target.value })} className="w-full border p-3 rounded mb-3" />
+            <textarea required placeholder="Describe the work" value={booking.description} onChange={(event) => setBooking({ ...booking, description: event.target.value })} className="w-full border p-3 rounded mb-3" rows="3" />
+            <button type="submit" className="bg-yellow-400 px-5 py-3 rounded font-semibold hover:bg-yellow-300">Send booking request</button>
+          </form>
+        )}
       </div>
     </section>
   );
