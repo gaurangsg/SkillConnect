@@ -69,7 +69,7 @@ The frontend is available at `http://localhost:5173`; the API listens on `http:/
 
 ## Deploy to Vercel
 
-The Vite frontend and Express API deploy in the same Vercel project. A shared serverless function forwards `/api/*` requests to the existing Express routes.
+The Vite frontend and Express API deploy in the same Vercel project. Vercel API functions route both top-level and nested `/api/*` paths to the existing Express routes.
 
 In the Vercel project settings, add `MONGODB_URI` and `JWT_SECRET` for each environment you deploy (Production and, if used, Preview). Redeploy after adding or changing them. Do not commit these values or copy local `.env` credentials into source control. The Atlas cluster must also permit secure connections from the deployed API.
 
