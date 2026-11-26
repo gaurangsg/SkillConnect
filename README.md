@@ -67,6 +67,12 @@ npm run dev
 
 The frontend is available at `http://localhost:5173`; the API listens on `http://localhost:5000`. Vite proxies frontend `/api` requests to the API. Check the API connection at `http://localhost:5000/api/health`.
 
+## Deploy to Vercel
+
+The Vite frontend and Express API deploy in the same Vercel project. A shared serverless function forwards `/api/*` requests to the existing Express routes.
+
+In the Vercel project settings, add `MONGODB_URI` and `JWT_SECRET` for each environment you deploy (Production and, if used, Preview). Redeploy after adding or changing them. Do not commit these values or copy local `.env` credentials into source control. The Atlas cluster must also permit secure connections from the deployed API.
+
 To load the service catalog and sample worker/review records into MongoDB:
 
 ```bash
