@@ -4,6 +4,7 @@ import express from 'express';
 import { isDatabaseConnected } from './config/database.js';
 import { createNewsletterSubscription, findWorkerById, listReviews, listServices, listWorkers } from './dataStore.js';
 import authRoutes from './routes/auth.js';
+import adminRoutes from './routes/admin.js';
 import bookingRoutes from './routes/bookings.js';
 import workerAdminRoutes from './routes/workerAdmin.js';
 
@@ -16,6 +17,7 @@ app.use(cors({ origin: allowedOrigin }));
 app.use(express.json());
 app.use('/api/auth', authRoutes);
 app.use('/api/bookings', bookingRoutes);
+app.use('/api/admin', adminRoutes);
 app.use('/api/admin/workers', workerAdminRoutes);
 
 app.get('/api/health', (_request, response) => {

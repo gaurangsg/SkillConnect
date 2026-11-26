@@ -2,7 +2,7 @@ import express from 'express';
 import mongoose from 'mongoose';
 import Booking from '../models/Booking.js';
 import { requireAuth, requireRole } from '../middleware/auth.js';
-import { findWorkerById, findWorkerByUserId, listServices } from '../dataStore.js';
+import { findWorkerById, findWorkerByUserId, listServices, listWorkers } from '../dataStore.js';
 
 const router = express.Router();
 router.use(requireAuth);
@@ -49,8 +49,20 @@ router.get('/', async (request, response, next) => {
     } else {
       query = { customerId: request.user._id };
     }
-    const bookings = await Booking.find(query).sort({ scheduledFor: 1 }).lean();
-    return response.json({ items: bookings, total: bookings.length });
+    const [bookings, workers, services] = await Promise.all([
+      Booking.find(query).populate('customerId', 'name email phone').sort({ scheduledFor: 1 }).lean(),
+      listWorkers({}),
+      listServices(),
+    ]);
+    const workerById = new Map(workers.map((worker) => [String(worker.id || worker._id), worker]));
+    const serviceById = new Map(services.map((service) => [service.id, service]));
+    const items = bookings.map((booking) => ({
+      ...booking,
+      workerName: workerById.get(String(booking.workerId))?.name || 'Professional',
+      workerSkill: workerById.get(String(booking.workerId))?.skill || '',
+      serviceName: serviceById.get(booking.serviceId)?.name || booking.serviceId,
+    }));
+    return response.json({ items, total: items.length });
   } catch (error) {
     return next(error);
   }

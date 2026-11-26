@@ -7,6 +7,31 @@ import { requireAuth, requireRole } from '../middleware/auth.js';
 const router = express.Router();
 router.use(requireAuth, requireRole('admin'));
 
+router.get('/', async (_request, response, next) => {
+  try {
+    const [profiles, workerAccounts] = await Promise.all([
+      Worker.find().populate('userId', 'name email').sort({ name: 1 }).lean(),
+      User.find({ role: 'worker' }).select('_id name email').sort({ name: 1 }).lean(),
+    ]);
+    const assignedAccountIds = new Set(profiles.map((profile) => String(profile.userId?._id || profile.userId || '')));
+    return response.json({
+      profiles: profiles.map((profile) => ({
+        id: profile._id,
+        name: profile.name,
+        skill: profile.skill,
+        rating: profile.rating,
+        verified: profile.verified,
+        account: profile.userId ? { id: profile.userId._id, name: profile.userId.name, email: profile.userId.email } : null,
+      })),
+      availableAccounts: workerAccounts
+        .filter((user) => !assignedAccountIds.has(String(user._id)))
+        .map((user) => ({ id: user._id, name: user.name, email: user.email })),
+    });
+  } catch (error) {
+    return next(error);
+  }
+});
+
 router.patch('/:workerId/assign', async (request, response, next) => {
   const { userId } = request.body || {};
   if (!mongoose.Types.ObjectId.isValid(userId)) {
