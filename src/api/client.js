@@ -1,4 +1,4 @@
-import { fallbackCatalogWorkers, fallbackReviews, fallbackServices, fallbackWorkers } from '../data/catalog';
+import { fallbackCatalogWorkers, fallbackReviews, fallbackServices, fallbackWorkers, reviewImagesByLegacyPath } from '../data/catalog';
 import { filterWorkers } from '../../shared/filterWorkers.js';
 
 const API_BASE_URL = (import.meta.env.VITE_API_URL || '/api').replace(/\/$/, '');
@@ -58,7 +58,14 @@ export async function getWorkerById(id) {
 }
 
 export async function getReviews() {
-  try { const result = await request('/reviews'); return Array.isArray(result) ? result : result.items || fallbackReviews; }
+  try {
+    const result = await request('/reviews');
+    const reviews = Array.isArray(result) ? result : result.items || fallbackReviews;
+    return reviews.map((review) => ({
+      ...review,
+      imageUrl: reviewImagesByLegacyPath[review.imageUrl] || review.imageUrl,
+    }));
+  }
   catch { return fallbackReviews; }
 }
 
