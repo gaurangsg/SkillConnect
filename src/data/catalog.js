@@ -1,3 +1,5 @@
+import { featuredWorkers, workers } from '../../shared/workerCatalog.js';
+
 export const fallbackServices = [
   { id: 'carpentry', name: 'Carpentry', description: 'Expert carpenters for furniture and fitting needs.', icon: 'tools' },
   { id: 'electrician', name: 'Electrician', description: 'Certified electricians for safe and quick solutions.', icon: 'bolt' },
@@ -9,16 +11,8 @@ export const fallbackServices = [
   { id: 'gardening', name: 'Gardening', description: 'Garden maintenance and landscaping at your doorstep.', icon: 'leaf' },
 ];
 
-export const fallbackWorkers = [
-  { id: 'worker-1', name: 'Christine Williams', skill: 'Plumber', imageUrl: 'https://randomuser.me/api/portraits/women/68.jpg' },
-  { id: 'worker-2', name: 'Sofia York', skill: 'Site Observer', imageUrl: 'https://images.unsplash.com/photo-1551836022-d5d88e9218df?w=500' },
-  { id: 'worker-3', name: 'John Doe', skill: 'Electrician', imageUrl: 'https://randomuser.me/api/portraits/men/32.jpg' },
-  { id: 'worker-4', name: 'Priya Sharma', skill: 'Painter', imageUrl: 'https://images.unsplash.com/photo-1561214115-f2f134cc4912?w=500' },
-  { id: 'worker-5', name: 'David Brown', skill: 'Mason', imageUrl: 'https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=500' },
-  { id: 'worker-6', name: 'Emily Davis', skill: 'Welder', imageUrl: 'https://images.unsplash.com/photo-1504917595217-d4dc5ebe6122?w=500' },
-  { id: 'worker-7', name: 'Mike Smith', skill: 'Carpenter', imageUrl: 'https://images.unsplash.com/photo-1504148455328-c376907d081c?w=500' },
-  { id: 'worker-8', name: 'Aisha Ali', skill: 'Gardener', imageUrl: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=500' },
-];
+export const fallbackWorkers = featuredWorkers;
+export const fallbackCatalogWorkers = workers;
 
 export const fallbackReviews = [
   { id: 'review-1', name: 'Supriya', imageUrl: '/src/assets/Clients/Supriya.png', rating: 4.5, text: 'The carpenter I found via SkillConnect was incredibly skilled, affordable, reliable, and professional.' },

@@ -1,6 +1,8 @@
-import { fallbackReviews, fallbackServices, fallbackWorkers } from '../data/catalog';
+import { fallbackCatalogWorkers, fallbackReviews, fallbackServices, fallbackWorkers } from '../data/catalog';
+import { filterWorkers } from '../../shared/filterWorkers.js';
 
 const API_BASE_URL = (import.meta.env.VITE_API_URL || '/api').replace(/\/$/, '');
+const featuredWorkerIds = new Set(fallbackWorkers.map((worker) => String(worker.id)));
 
 async function request(path, options = {}) {
   let response;
@@ -27,13 +29,31 @@ export async function getServices() {
   catch { return fallbackServices; }
 }
 
-export async function getWorkers(search = '') {
+export async function getWorkers(search = '', serviceId = '') {
+  const params = new URLSearchParams();
+  if (search.trim()) params.set('search', search.trim());
+  if (serviceId) params.set('serviceId', serviceId);
   try {
-    const result = await request(`/workers${search ? `?search=${encodeURIComponent(search)}` : ''}`);
-    return result.items || result.workers || [];
+    const query = params.toString();
+    const result = await request(`/workers${query ? `?${query}` : ''}`);
+    const workers = result.items || result.workers || [];
+    if (!search.trim() && !serviceId) {
+      return workers.filter((worker) => featuredWorkerIds.has(String(worker.id || worker._id)));
+    }
+    return filterWorkers(workers, search, serviceId);
   } catch {
-    const normalizedSearch = search.toLowerCase();
-    return fallbackWorkers.filter((worker) => `${worker.name} ${worker.skill}`.toLowerCase().includes(normalizedSearch));
+    const catalog = search.trim() || serviceId ? fallbackCatalogWorkers : fallbackWorkers;
+    return filterWorkers(catalog, search, serviceId);
+  }
+}
+
+export async function getWorkerById(id) {
+  try {
+    return await request(`/workers/${encodeURIComponent(id)}`);
+  } catch (error) {
+    const worker = fallbackCatalogWorkers.find((item) => String(item.id || item._id) === String(id));
+    if (worker) return worker;
+    throw error;
   }
 }
 

@@ -1,3 +1,5 @@
+export { workers } from '../../shared/workerCatalog.js';
+
 export const services = [
   { id: 'carpentry', name: 'Carpentry', description: 'Expert carpenters for furniture and fitting needs.', icon: 'tools' },
   { id: 'electrician', name: 'Electrician', description: 'Certified electricians for safe and quick solutions.', icon: 'bolt' },
@@ -7,17 +9,6 @@ export const services = [
   { id: 'ac-repair', name: 'AC Repair', description: 'Fast air conditioning repair and maintenance.', icon: 'snowflake' },
   { id: 'masonry', name: 'Masonry', description: 'Skilled masons for construction and tiling work.', icon: 'hammer' },
   { id: 'gardening', name: 'Gardening', description: 'Garden maintenance and landscaping at your doorstep.', icon: 'leaf' },
-];
-
-export const workers = [
-  { id: 'worker-1', name: 'Christine Williams', skill: 'Plumber', imageUrl: 'https://randomuser.me/api/portraits/women/68.jpg', rating: 4.8, verified: true },
-  { id: 'worker-2', name: 'Sofia York', skill: 'Site Observer', imageUrl: 'https://images.unsplash.com/photo-1551836022-d5d88e9218df?w=500', rating: 4.7, verified: true },
-  { id: 'worker-3', name: 'John Doe', skill: 'Electrician', imageUrl: 'https://randomuser.me/api/portraits/men/32.jpg', rating: 4.9, verified: true },
-  { id: 'worker-4', name: 'Priya Sharma', skill: 'Painter', imageUrl: 'https://images.unsplash.com/photo-1561214115-f2f134cc4912?w=500', rating: 4.6, verified: true },
-  { id: 'worker-5', name: 'David Brown', skill: 'Mason', imageUrl: 'https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=500', rating: 4.8, verified: true },
-  { id: 'worker-6', name: 'Emily Davis', skill: 'Welder', imageUrl: 'https://images.unsplash.com/photo-1504917595217-d4dc5ebe6122?w=500', rating: 4.7, verified: true },
-  { id: 'worker-7', name: 'Mike Smith', skill: 'Carpenter', imageUrl: 'https://images.unsplash.com/photo-1504148455328-c376907d081c?w=500', rating: 4.8, verified: true },
-  { id: 'worker-8', name: 'Aisha Ali', skill: 'Gardener', imageUrl: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=500', rating: 4.9, verified: true },
 ];
 
 export const reviews = [

@@ -12,7 +12,9 @@ SkillConnect is a full-stack marketplace for discovering local home-service prof
 
 ## What it includes
 
-- Search service categories and browse worker profiles, ratings, and availability.
+- Keep eight featured worker cards on the homepage; selecting a category or searching opens the expanded catalog.
+- Open worker profiles to review ratings, experience, specialties, service areas, and booking details.
+- Clearly mark generated catalog entries as demo profiles; replace their illustrative data before using them as real listings.
 - Customer accounts, password reset flow, and booking history.
 - Worker dashboards for assigned booking requests and status updates.
 - Admin console for marketplace metrics, orders, accounts, and worker assignments.
@@ -29,6 +31,7 @@ SkillConnect is a full-stack marketplace for discovering local home-service prof
 ```text
 src/                  React application
 public/               Static frontend assets
+shared/               Worker catalog shared by frontend and API
 server/src/           Express API, models, routes, and middleware
 docs/screenshots/     README screenshots
 ```

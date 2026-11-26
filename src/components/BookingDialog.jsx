@@ -3,7 +3,7 @@ import { Alert, Box, Button, CircularProgress, Dialog, DialogContent, IconButton
 import { FaCalendarAlt, FaMapMarkedAlt, FaMapMarkerAlt, FaPaperPlane, FaTimes } from 'react-icons/fa';
 import { createBooking } from '../api/client';
 
-const serviceIds = { plumber: 'plumbing', electrician: 'electrician', painter: 'painting', mason: 'masonry', carpenter: 'carpentry', gardener: 'gardening', welder: 'masonry', 'site observer': 'masonry' };
+const serviceIds = { plumber: 'plumbing', electrician: 'electrician', painter: 'painting', mason: 'masonry', carpenter: 'carpentry', gardener: 'gardening', cleaner: 'cleaning', 'ac technician': 'ac-repair', 'hvac technician': 'ac-repair', welder: 'masonry', 'site observer': 'masonry' };
 
 export default function BookingDialog({ worker, token, user, onClose, notify }) {
   const [form, setForm] = useState({ scheduledFor: '', address: user?.addresses?.[0]?.label || user?.address || '', description: '' });
@@ -31,7 +31,7 @@ export default function BookingDialog({ worker, token, user, onClose, notify }) 
       const skill = worker.skill?.toLowerCase() || '';
       const result = await createBooking(token, {
         workerId: String(worker.id || worker._id),
-        serviceId: serviceIds[skill] || worker.serviceId || 'electrician',
+        serviceId: worker.serviceId || serviceIds[skill] || 'electrician',
         scheduledFor: form.scheduledFor,
         address: form.address.trim(),
         description: form.description.trim(),
@@ -57,6 +57,7 @@ export default function BookingDialog({ worker, token, user, onClose, notify }) 
             <TextField required label="Service address" placeholder="House, street, area, city" value={form.address} onChange={(event) => setForm({ ...form, address: event.target.value })} helperText={user?.addresses?.length ? 'Your saved address has been filled in. You can edit it for this request.' : 'Add the address where you need the service.'} />
             <Button onClick={locate} disabled={locating} startIcon={locating ? <CircularProgress size={16} /> : <FaMapMarkedAlt />} sx={{ alignSelf: 'flex-start', px: 0, color: '#287d59' }}>{locating ? 'Finding your location…' : 'Add my current location pin'}</Button>
             <TextField required multiline minRows={3} label="What needs to be done?" placeholder="Share the details that will help the professional prepare." value={form.description} onChange={(event) => setForm({ ...form, description: event.target.value })} slotProps={{ htmlInput: { maxLength: 1000 } }} />
+            {worker.isDemo && <Alert severity="info" sx={{ borderRadius: 3 }}>This is a demo professional. The request is for testing and is not sent to an active worker.</Alert>}
             {message && <Alert severity={message.includes('pin added') ? 'success' : 'error'} sx={{ borderRadius: 3 }}>{message}</Alert>}
             <Button disabled={loading} type="submit" variant="contained" endIcon={loading ? <CircularProgress size={17} color="inherit" /> : <FaPaperPlane />} sx={{ minHeight: 52, bgcolor: '#173d36', '&:hover': { bgcolor: '#225848' } }}>{loading ? 'Sending request…' : 'Send booking request'}</Button>
             <Stack direction="row" spacing={1} sx={{ alignItems: 'center', justifyContent: 'center', color: 'text.secondary' }}><FaMapMarkerAlt size={12} /><Typography variant="caption">Your booking address is used only to coordinate this service.</Typography></Stack>

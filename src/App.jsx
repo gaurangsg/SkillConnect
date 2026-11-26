@@ -15,6 +15,7 @@ import HowItWorks from './components/HowItWorks';
 import CTASection from './components/CTASection';
 import EmergencyCallButton from './components/EmergencyCallButton';
 import PasswordResetPage from './components/PasswordResetPage';
+import WorkerProfilePage from './components/WorkerProfilePage';
 import { getCurrentUser } from './api/client';
 
 function Marketplace({ session, openAuth, notify }) {
@@ -97,6 +98,7 @@ function App() {
             <Route path="/account" element={<DashboardPage session={session} onOpenAuth={openAuth} onLogout={logout} notify={notify} />} />
             <Route path="/worker/dashboard" element={<DashboardPage session={session} onOpenAuth={openAuth} onLogout={logout} notify={notify} />} />
             <Route path="/admin" element={<AdminDashboardPage session={session} onOpenAuth={openAuth} onLogout={logout} notify={notify} />} />
+            <Route path="/professionals/:id" element={<WorkerProfilePage token={session.token} user={session.user} onNeedAuth={openAuth} notify={notify} />} />
             <Route path="/reset-password" element={<PasswordResetPage onOpenAuth={openAuth} />} />
             <Route path="*" element={<Marketplace session={session} openAuth={openAuth} notify={notify} />} />
           </Routes>

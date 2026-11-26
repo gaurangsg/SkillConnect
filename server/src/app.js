@@ -33,10 +33,14 @@ app.get('/api/services', async (_request, response, next) => {
 });
 
 app.get('/api/workers', async (request, response, next) => {
-  const search = String(request.query.search || '').trim().toLowerCase();
-  const skill = String(request.query.skill || '').trim().toLowerCase();
+  const search = String(request.query.search || '').trim().slice(0, 100);
+  const serviceId = String(request.query.serviceId || '').trim().toLowerCase();
   try {
-    const filteredWorkers = await listWorkers({ search, skill });
+    const filteredWorkers = await listWorkers({
+      search,
+      serviceId,
+      featuredOnly: !search && !serviceId,
+    });
     response.json({ items: filteredWorkers, total: filteredWorkers.length });
   } catch (error) {
     next(error);

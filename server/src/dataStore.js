@@ -22,21 +22,58 @@ export async function listServices() {
   return documents.map(normalizeDocument);
 }
 
-export async function listWorkers({ search = '', skill = '' }) {
+const legacyServiceSkills = {
+  carpentry: ['Carpenter'],
+  electrician: ['Electrician'],
+  plumbing: ['Plumber'],
+  painting: ['Painter'],
+  cleaning: ['Cleaner'],
+  'ac-repair': ['AC Technician', 'HVAC Technician'],
+  masonry: ['Mason', 'Welder', 'Site Observer'],
+  gardening: ['Gardener'],
+};
+
+function matchesWorker(worker, { search, serviceId, featuredOnly }) {
+  if (featuredOnly && !worker.featured) return false;
+  if (serviceId && worker.serviceId !== serviceId) return false;
+  if (!search) return true;
+  const searchableFields = [worker.name, worker.skill, worker.bio, ...(worker.specialties || [])];
+  return searchableFields.some((field) => String(field || '').toLowerCase().includes(search.toLowerCase()));
+}
+
+export async function listWorkers({ search = '', serviceId = '', featuredOnly = false } = {}) {
   if (!isDatabaseConnected()) {
-    const normalizedSearch = search.toLowerCase();
-    const normalizedSkill = skill.toLowerCase();
-    return fallbackWorkers.filter((worker) => {
-      const matchesSearch = !normalizedSearch || `${worker.name} ${worker.skill}`.toLowerCase().includes(normalizedSearch);
-      const matchesSkill = !normalizedSkill || worker.skill.toLowerCase() === normalizedSkill;
-      return matchesSearch && matchesSkill;
+    return fallbackWorkers.filter((worker) => matchesWorker(worker, { search, serviceId, featuredOnly }));
+  }
+
+  const filters = [];
+  if (featuredOnly) filters.push({ featured: true });
+  if (serviceId) {
+    const legacySkills = legacyServiceSkills[serviceId] || [];
+    filters.push({
+      $or: [
+        { serviceId },
+        ...legacySkills.map((skill) => ({
+          serviceId: { $exists: false },
+          skill: new RegExp(`^${skill.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, 'i'),
+        })),
+      ],
+    });
+  }
+  if (search) {
+    const searchPattern = new RegExp(search.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i');
+    filters.push({
+      $or: [
+        { name: searchPattern },
+        { skill: searchPattern },
+        { bio: searchPattern },
+        { specialties: searchPattern },
+      ],
     });
   }
 
-  const query = {};
-  if (skill) query.skill = new RegExp(`^${skill.replace(/[.*+?^${}()|[\\]\\]/g, '\\$&')}$`, 'i');
-  if (search) query.$text = { $search: search };
-  const documents = await Worker.find(query).sort({ rating: -1, name: 1 }).lean();
+  const query = filters.length > 1 ? { $and: filters } : filters[0] || {};
+  const documents = await Worker.find(query).sort({ featured: -1, rating: -1, name: 1 }).lean();
   return documents.map(normalizeDocument);
 }
 
